@@ -1,10 +1,32 @@
+from .models import VaultItem
+from .encryption import encrypt_data, decrypt_data
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
+from django.contrib import messages 
 
+@login_required
 def home(request):
-    return render(request, 'vault/home.html')
+    items = VaultItem.objects.filter(user=request.user)
+
+    if request.method == 'POST':
+        title = request.POST['title']
+        secret = request.POST['secret']
+
+        encrypted = encrypt_data(secret)
+
+        VaultItem.objects.create(
+            user=request.user,
+            title=title,
+            encrypted_data=encrypted
+        )
+        return redirect('home')
+
+    for item in items:
+        item.decrypted = decrypt_data(item.encrypted_data)
+
+    return render(request, 'vault/home.html', {'items': items})
 
 def register(request):
     if request.method == 'POST':

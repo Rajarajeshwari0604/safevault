@@ -6,38 +6,24 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages 
 
-@login_required
 def home(request):
-    items = VaultItem.objects.filter(user=request.user)
-
-    if request.method == 'POST':
-        title = request.POST['title']
-        secret = request.POST['secret']
-
-        encrypted = encrypt_data(secret)
-
-        VaultItem.objects.create(
-            user=request.user,
-            title=title,
-            encrypted_data=encrypted
-        )
-        return redirect('home')
-
-    for item in items:
-        item.decrypted = decrypt_data(item.encrypted_data)
-
-    return render(request, 'vault/home.html', {'items': items})
+    return render(request, 'vault/home.html')
 
 def register(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+  if request.method == 'POST':
+    title = request.POST['title']
+    secret = request.POST['secret']
+    uploaded_file = request.FILES.get('file')
 
-        User.objects.create_user(username=username, password=password)
-        messages.success(request, 'Account created successfully')
-        return redirect('login')
+    encrypted = encrypt_data(secret)
 
-    return render(request, 'vault/register.html')
+    VaultItem.objects.create(
+        user=request.user,
+        title=title,
+        encrypted_data=encrypted,
+        uploaded_file=uploaded_file
+    )
+    return redirect('home')
 
 def login_view(request):
     if request.method == 'POST':

@@ -1,9 +1,10 @@
 <h2>SafeVault Dashboard</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="text" name="title" placeholder="Title" required><br>
     <input type="text" name="secret" placeholder="Secret Data" required><br>
+    <input type="file" name="file"><br>
     <button type="submit">Save Securely</button>
 </form>
 
@@ -12,7 +13,15 @@
 <h3>Your Vault Items</h3>
 <ul>
     {% for item in items %}
-        <li><b>{{ item.title }}</b> : {{ item.decrypted }}</li>
+        <li>
+            <b>{{ item.title }}</b> : {{ item.decrypted }}
+            {% if item.uploaded_file %}
+                <br>
+                <a href="{{ item.uploaded_file.url }}" target="_blank">
+                    View File
+                </a>
+            {% endif %}
+        </li>
     {% empty %}
         <li>No data stored yet</li>
     {% endfor %}

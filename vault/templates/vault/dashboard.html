@@ -1,0 +1,26 @@
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="text" name="title" required>
+
+    <textarea name="secret_data" required></textarea>
+
+    <input type="file" name="file">
+
+    <button type="submit">Save Securely</button>
+</form>
+
+<h3>Your Vault Items</h3>
+
+{% if items %}
+<ul>
+    {% for item in items %}
+        <li>
+            {{ item.title }}
+            {% if item.uploaded_file %}
+                - {{ item.uploaded_file.name }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    
